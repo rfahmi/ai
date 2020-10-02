@@ -1,0 +1,13 @@
+{
+  "name": "rfahmi/ai",
+  "description": "Implementasi algoritma apriori",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "rfahmi",
+      "email": "rfahmi@outlook.com"
+    }
+  ],
+  "require": {}
+}
