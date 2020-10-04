@@ -88,7 +88,7 @@ class Apriori
 		// Create combination & count
 		for ($i = 0; $i < $items_length; $i++) {
 			$combination_size = $i + 1;
-			$combination = $this->createCombinations($items, $combination_size);
+			$combination = $this->createCombinations($items, $combination_size, false);
 			$temp = [];
 			foreach ($combination as $key => $value) {
 				$combination_count = $this->countCombination($value['combination'], $transactions);
@@ -107,14 +107,10 @@ class Apriori
 					$antecedent = $combinations['combination'][0];
 					$combination_size = count($combinations['combination']);
 
-					$rule_combination = $this->createCombinations($combinations['combination'], $combination_size);
-					dump($rule_combination);
-					// foreach ($combinations['combination'] as $item_key => $item) {
-					// 	// if ($item_key > 0) {
-					// 	// 	dump($antecedent);
-					// 	// 	echo $item . '=>' . $combination_count;
-					// 	// }
-					// }
+					$rule_combination = $this->createCombinations($combinations['combination'], $combination_size, true);
+					foreach ($rule_combination['combination'] as $rule) {
+						dump($rule);
+					}
 				}
 			}
 		}
@@ -123,7 +119,8 @@ class Apriori
 		return $frequent_set;
 	}
 
-	private function createCombinations($payload, $size)
+	//HELPERS
+	private function createCombinations($payload, $size, $repeat = false)
 	{
 		$itemset = [''];
 
@@ -133,9 +130,16 @@ class Apriori
 			foreach ($itemset as $item) {
 				$i3 = 0;
 				foreach ($payload as $p) {
-					if ($i3 >= $i2 && strpos($item, $p) === false) {
-						$combination = $item !== '' ? $item . ',' . $p : $p;
-						$temp[] = $combination;
+					if ($repeat) {
+						if (strpos($item, $p) === false) {
+							$combination = $item !== '' ? $item . ',' . $p : $p;
+							$temp[] = $combination;
+						}
+					} else {
+						if ($i3 >= $i2 && strpos($item, $p) === false) {
+							$combination = $item !== '' ? $item . ',' . $p : $p;
+							$temp[] = $combination;
+						}
 					}
 					$i3++;
 				}
