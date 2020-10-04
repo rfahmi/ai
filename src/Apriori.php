@@ -91,15 +91,8 @@ class Apriori
 			$combination = $this->createCombinations($items, $combination_size);
 			$temp = [];
 			foreach ($combination as $key => $value) {
-				$combination_array = explode(',', $value);
-				$combination_count = $this->countCombination($combination_array, $transactions);
-				$child = [
-					'combination' => $combination_array,
-					'count' => $combination_count,
-					// 'support' => $this->countSupport($combination_count, $transactions_length),
-					// 'confidence' => $this->countConfidence($combination_count, $transactions),
-				];
-				$combination[$key] = $child;
+				$combination_count = $this->countCombination($value['combination'], $transactions);
+				$combination[$key]['count'] = $combination_count;
 			}
 			$i != 0 ?: $this->setK1Items($combination);
 			$frequent_set[$i] = $combination;
@@ -149,6 +142,14 @@ class Apriori
 				$i2++;
 			}
 			$itemset = $temp;
+		}
+
+		foreach ($itemset as $key => $value) {
+			$combination_array = explode(',', $value);
+			$child = [
+				'combination' => $combination_array,
+			];
+			$itemset[$key] = $child;
 		}
 
 		return $itemset;
