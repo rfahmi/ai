@@ -8,14 +8,13 @@ namespace Rfahmi\Ai;
  * (c) Fahmi Rizalul - September 2020
  *
  * This package is made for my college research purpose
+ * If there is some performance issue in my code, your pull contribution is welcome.
  *
  *
  * ******** HOW THIS PACKAGE WORKS? ********
  * INIT
  * 1. use Rfahmi\Ai\Apriori;
  * 2. $apriori = new Apriori;
- * 3. $apriori->setSupport(3);
- * 4. $apriori->setConfidence(75);
  *
  * TRAIN
  * 1. train( items, transactions )
@@ -27,7 +26,9 @@ namespace Rfahmi\Ai;
  * *2. createRules()
  *
  * PREDICT
- * *1. predict( items )
+ *  1. $apriori->setSupport(3);
+ * 	2. $apriori->setConfidence(75);
+ * *3. predict( items )
  *
  */
 
@@ -67,13 +68,14 @@ class Apriori
 		$this->confidence = $confidence;
 
 		$frequents = $this->createFrequentSet($items, $transactions);
+		$rules = $this->createRules($frequents);
 
 		$return['frequents'] = $frequents;
 
 		return $return;
 	}
 
-	public function predict($items, $transactions)
+	public function predict($items)
 	{
 		return true;
 	}
@@ -98,32 +100,55 @@ class Apriori
 			$frequent_set[$i] = $combination;
 		}
 
+		return $frequent_set;
+	}
+
+	private function createRules($items, $transactions)
+	{
 		$rules = [];
 		// Create rules with support and confidence
 		foreach ($frequent_set as $key => $value) {
 			if ($key > 0) {
 				foreach ($value as $combinations) {
-					$combination_count = $combinations['count'];
-					$antecedent = $combinations['combination'][0];
 					$combination_size = count($combinations['combination']);
 
 					$rule_combination = $this->createCombinations($combinations['combination'], $combination_size, true);
-					foreach ($rule_combination['combination'] as $rule) {
-						dump($rule);
+					// echo 'TOP-----------------------------------<br>';
+					// dump($rule_combination);
+					// echo '<br>BOTTOM-----------------------------------<br>';
+					for ($i = 0; $i < $combination_size; $i++) {
+						$rule_size = count($rule_combination[$i]['combination']);
+
+						$rule_body = [];
+						$antecedent = [];
+						$consequent = [];
+						for ($j = 0; $j < $rule_size; $j++) {
+							if (($j + 1) === $rule_size) {
+								array_push($consequent, $rule_combination[$i]['combination'][$j]);
+							} else {
+								array_push($antecedent, $rule_combination[$i]['combination'][$j]);
+							}
+
+							// count($rule_array) > 0 ? $rule_array[$i] . ',' . $rule['combination'][$i] : $rule['combination'][$i]
+						}
+						$rule_body['antecedent'] = $antecedent;
+						$rule_body['consequent'] = $consequent;
+						$rule_body['support'] = 0;
+						$rule_body['confidence'] = 0;
+
+						array_push($rules, $rule_body);
 					}
 				}
 			}
 		}
-		dd();
 
-		return $frequent_set;
+		return $rules;
 	}
 
 	//HELPERS
 	private function createCombinations($payload, $size, $repeat = false)
 	{
 		$itemset = [''];
-
 		for ($i = 0; $i < $size; $i++) {
 			$temp = [];
 			$i2 = 0;
@@ -195,10 +220,11 @@ class Apriori
 		return $result;
 	}
 
-	private function countConfidence($combination_count, $transactions_length)
+	private function countConfidence($combination_count, $antecedent_count)
 	{
-		$antecedent =
-		$result = $combination_count / $transactions_length;
+		$result = $combination_count / $antecedent_count;
+
+		return $result;
 	}
 
 	private function createRules($itemsets, $transactions)
