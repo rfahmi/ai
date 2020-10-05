@@ -226,9 +226,4 @@ class Apriori
 
 		return $result;
 	}
-
-	private function createRules($itemsets, $transactions)
-	{
-		return true;
-	}
 }
