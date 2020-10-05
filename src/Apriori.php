@@ -20,37 +20,42 @@ namespace Rfahmi\Ai;
  * 1. train( items, transactions )
  *	 1.1. createFrequentSet( items , transaction )
  *	 	1.1.1. createCombinations( items , size )
- *	 	1.1.2. countSupport( items(array) , transactions )
- *	 	*1.1.3. countConfidence( items(array) , transactions )
- *	 1.2. Return frequent
- * *2. createRules()
+ *	 	1.1.2. countCombination( item , transaction )
+ *	 1.2. Return frequent_set
+ * 2. createRules( frequent_set )
+ *	 *2.1. countSupport( items[] , transactions )
+ *	 *2.2. countConfidence( items[] , transactions )
  *
  * PREDICT
- *  1. $apriori->setSupport(3);
- * 	2. $apriori->setConfidence(75);
- * *3. predict( items )
+ * 1. $apriori->setSupport(3);
+ * 2. $apriori->setConfidence(0.75);
+ * *3. predict( antecedent[] )
+ * *4. Return consequent[]
  *
  */
 
 class Apriori
 {
+	// RESULT
+	private $frequent_set = [];
+
+	private $rules = [];
+
 	//CONFIG
 	private $support = 2;
 
 	private $confidence = 75;
 
-	private $k1_items = [];
-
 	//SETTER
-	public function setRules($arr)
-	{
-		$this->rules = $arr;
-	}
+	// public function setRules($arr)
+	// {
+	// 	$this->rules = $arr;
+	// }
 
-	public function setK1Items($arr)
-	{
-		$this->k1_items = $arr;
-	}
+	// public function setFrequentSet($arr)
+	// {
+	// 	$this->frequent_set = $arr;
+	// }
 
 	//GETTER
 	public function getRules()
@@ -67,12 +72,14 @@ class Apriori
 		$this->support = $support;
 		$this->confidence = $confidence;
 
-		$frequents = $this->createFrequentSet($items, $transactions);
-		$rules = $this->createRules($frequents);
+		try {
+			$this->frequent_set = $this->createFrequentSet($items, $transactions);
+			$this->rules = $this->createRules();
 
-		$return['frequents'] = $frequents;
-
-		return $return;
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 
 	public function predict($items)
@@ -96,26 +103,21 @@ class Apriori
 				$combination_count = $this->countCombination($value['combination'], $transactions);
 				$combination[$key]['count'] = $combination_count;
 			}
-			$i != 0 ?: $this->setK1Items($combination);
 			$frequent_set[$i] = $combination;
 		}
 
 		return $frequent_set;
 	}
 
-	private function createRules($items, $transactions)
+	private function createRules()
 	{
 		$rules = [];
-		// Create rules with support and confidence
-		foreach ($frequent_set as $key => $value) {
+		foreach ($this->frequent_set as $key => $value) {
 			if ($key > 0) {
 				foreach ($value as $combinations) {
 					$combination_size = count($combinations['combination']);
 
 					$rule_combination = $this->createCombinations($combinations['combination'], $combination_size, true);
-					// echo 'TOP-----------------------------------<br>';
-					// dump($rule_combination);
-					// echo '<br>BOTTOM-----------------------------------<br>';
 					for ($i = 0; $i < $combination_size; $i++) {
 						$rule_size = count($rule_combination[$i]['combination']);
 
@@ -128,13 +130,11 @@ class Apriori
 							} else {
 								array_push($antecedent, $rule_combination[$i]['combination'][$j]);
 							}
-
-							// count($rule_array) > 0 ? $rule_array[$i] . ',' . $rule['combination'][$i] : $rule['combination'][$i]
 						}
 						$rule_body['antecedent'] = $antecedent;
 						$rule_body['consequent'] = $consequent;
-						$rule_body['support'] = 0;
-						$rule_body['confidence'] = 0;
+						$rule_body['support'] = $this->countSupport(count($antecedent), 10);
+						$rule_body['confidence'] = $this->countConfidence(count($antecedent), 10);
 
 						array_push($rules, $rule_body);
 					}
