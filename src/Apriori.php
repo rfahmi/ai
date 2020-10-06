@@ -18,9 +18,9 @@ namespace Rfahmi\Ai;
  *
  * TRAIN
  * 1. train( items, transactions )
- *	 1.1. createFrequentSet( items , transaction )
+ *	 1.1. createFrequentSet( items )
  *	 	1.1.1. createCombinations( items , size )
- *	 	1.1.2. countCombination( item , transaction )
+ *	 	1.1.2. countCombination( item )
  *	 1.2. Return frequent_set
  * 2. createRules( frequent_set )
  *	 2.1. countSupport( items[] )
@@ -56,6 +56,20 @@ class Apriori
 	private $confidence = 75;
 
 	//SETTER
+	public function setSupport($num)
+	{
+		$this->support = $num;
+
+		return true;
+	}
+
+	public function setConfidence($num)
+	{
+		$this->confidence = $num;
+
+		return true;
+	}
+
 	public function setItems($items)
 	{
 		$this->items = $items;
@@ -83,10 +97,7 @@ class Apriori
 		return $this->rules;
 	}
 
-	// public function __construct()
-	// {
-	// }
-
+	//PUBLIC METHOD
 	public function train($items, $transactions, $support = 2, $confidence = 75)
 	{
 		//INIT
@@ -125,6 +136,11 @@ class Apriori
 			}
 			$frequent_set[$i] = $combination;
 		}
+
+		for ($i = 0; $i < count($frequent_set); $i++) {
+			$frequent_set[$i] = array_filter($frequent_set[$i], function ($x) { return $x['count'] >= $this->support; });
+		}
+		$frequent_set = array_filter($frequent_set, function ($x) { return count($x) > 0; });
 
 		return $frequent_set;
 	}
