@@ -15,6 +15,8 @@ namespace Rfahmi\Ai;
  * INIT
  * 1. use Rfahmi\Ai\Apriori;
  * 2. $apriori = new Apriori;
+ * 3. $apriori->setSupport( decimal );
+ * 4. $apriori->setConfidence( decimal );
  *
  * TRAIN
  * 1. train( items, transactions )
@@ -38,8 +40,6 @@ class Apriori
 {
 	// RESULT
 	private $frequent_set = [];
-
-	private $rules = [];
 
 	//HELPER PROPS
 	private $items = [];
@@ -89,12 +89,16 @@ class Apriori
 	//GETTER
 	public function getFrequentSet()
 	{
-		return $this->frequent_set;
+		$string = file_get_contents(__DIR__ . '/../models/apriori_frequentset.json');
+
+		return json_decode($string, true);
 	}
 
 	public function getRules()
 	{
-		return $this->rules;
+		$string = file_get_contents(__DIR__ . '/../models/apriori_rules.json');
+
+		return json_decode($string, true);
 	}
 
 	//PUBLIC METHOD
@@ -109,7 +113,7 @@ class Apriori
 
 		try {
 			$this->frequent_set = $this->createFrequentSet();
-			$this->rules = $this->createRules();
+			$this->createRules();
 
 			return true;
 		} catch (Exception $e) {
@@ -141,6 +145,8 @@ class Apriori
 			$frequent_set[$i] = array_filter($frequent_set[$i], function ($x) { return $x['count'] >= $this->support; });
 		}
 		$frequent_set = array_filter($frequent_set, function ($x) { return count($x) > 0; });
+
+		file_put_contents(__DIR__ . '\..\models\apriori_frequentset.json', json_encode($frequent_set));
 
 		return $frequent_set;
 	}
@@ -182,7 +188,7 @@ class Apriori
 			}
 		}
 
-		return $rules;
+		return file_put_contents(__DIR__ . '\..\models\apriori_rules.json', json_encode($rules));
 	}
 
 	//HELPERS
