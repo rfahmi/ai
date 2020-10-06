@@ -123,7 +123,17 @@ class Apriori
 
 	public function predict($items)
 	{
-		return true;
+		$rules = json_decode(file_get_contents(__DIR__ . '/../models/apriori_rules.json'));
+		$result = [];
+		for ($i = 0; $i < count($rules); $i++) {
+			if ($this->in_array_all($items, $rules[$i]->antecedent)) {
+				$data['item'] = $rules[$i]->consequent[0];
+				$data['confidence'] = $rules[$i]->confidence;
+				array_push($result, $data);
+			}
+		}
+
+		return $result;
 	}
 
 	//PRIVATE METHODS
