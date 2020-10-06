@@ -153,9 +153,12 @@ class Apriori
 						}
 						$rule_body['antecedent'] = $antecedent;
 						$rule_body['consequent'] = $consequent;
-						$rule_body['support'] = $this->countSupport(count($antecedent));
+
+						$result = array_search($rule_combination[$i]['combination'], array_column($this->frequent_set, 'combination', 'count'), true);
 						$antecedent_count = $this->countCombination($antecedent);
-						$rule_body['confidence'] = $this->countConfidence(count($antecedent), $antecedent_count);
+						$combination_count = $this->countCombination($rule_combination[$i]['combination']);
+						$rule_body['support'] = $this->countSupport($combination_count);
+						$rule_body['confidence'] = $this->countConfidence($combination_count, $antecedent_count);
 
 						array_push($rules, $rule_body);
 					}
@@ -207,51 +210,32 @@ class Apriori
 
 	private function countCombination($comb_items)
 	{
-		$count = 0;
-		foreach ($this->transactions as $transaction) {
-			$comb_items_last = count($comb_items) - 1;
-			$first_is_fail = 0;
-			foreach ($comb_items as $ci_key => $ci) {
-				$confirm = 0;
-				if ($first_is_fail == 0) {
-					// echo '----CARI [' . $ci . ']-----------------------------------<br>';
-					foreach ($transaction as $ti) {
-						if ($ci == $ti) {
-							// echo 'ADA, KARENA ' . $ci . '=' . $ti . '<br>';
-							// echo $ci_key . '&' . $comb_items_last . ' lolos ' . $confirm . '<br>';
-							$confirm = 1;
-							break;
-						} else {
-							// echo 'TIDAK ADA, KARENA ' . $ci . '!=' . $ti . '<br>';
-							$confirm = 0;
-							if ($ci_key == 0) {
-								$first_is_fail = 1;
-							}
-						}
-						// echo $ci . '=' . $confirm . ',';
-					}
-				}
-				// echo '<br>';
+		$result = 0;
+		foreach ($this->transactions as $key => $value) {
+			if ($this->in_array_all($comb_items, $value)) {
+				$result++;
 			}
-			$confirm == 0 ?: $count++;
-			// echo 'sekarang count: ' . $count . '<br><br><br>';
 		}
-		// echo 'HASIL AKHIR ' . $count;
 
-		return ($count ?: 1);
+		return $result;
 	}
 
 	private function countSupport($combination_count)
 	{
-		$result = $combination_count . ',' . $this->transactions_length;
+		$result = $combination_count / $this->transactions_length;
 
 		return $result;
 	}
 
 	private function countConfidence($combination_count, $antecedent_count)
 	{
-		$result = $combination_count / $antecedent_count;
+		$result = $antecedent_count > 0 ? $combination_count / $antecedent_count : 0;
 
 		return $result;
+	}
+
+	private function in_array_all($needles, $haystack)
+	{
+		return empty(array_diff($needles, $haystack));
 	}
 }
