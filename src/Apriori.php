@@ -102,14 +102,11 @@ class Apriori
 	}
 
 	//PUBLIC METHOD
-	public function train($items, $transactions, $support = 2, $confidence = 75)
+	public function train($items, $transactions)
 	{
 		//INIT
 		$this->setItems($items);
 		$this->setTransactions($transactions);
-
-		$this->support = $support;
-		$this->confidence = $confidence;
 
 		try {
 			$this->frequent_set = $this->createFrequentSet();
@@ -132,7 +129,7 @@ class Apriori
 				array_push($result, $data);
 			}
 		}
-		$unique = array_unique($result,SORT_REGULAR);
+		$unique = array_unique($result, SORT_REGULAR);
 
 		return $unique;
 	}
@@ -198,6 +195,7 @@ class Apriori
 				}
 			}
 		}
+		$rules = array_filter($rules, function ($x) { return $x['confidence'] >= $this->confidence; });
 
 		return file_put_contents(__DIR__ . '\..\models\apriori_rules.json', json_encode($rules));
 	}
@@ -213,12 +211,12 @@ class Apriori
 				$i3 = 0;
 				foreach ($payload as $p) {
 					if ($repeat) {
-						if (strpos($item, $p) === false) {
+						if (strpos($item, (string)$p) === false) {
 							$combination = $item !== '' ? $item . ',' . $p : $p;
 							$temp[] = $combination;
 						}
 					} else {
-						if ($i3 >= $i2 && strpos($item, $p) === false) {
+						if ($i3 >= $i2 && strpos($item, (string)$p) === false) {
 							$combination = $item !== '' ? $item . ',' . $p : $p;
 							$temp[] = $combination;
 						}
