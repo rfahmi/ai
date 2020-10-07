@@ -132,8 +132,9 @@ class Apriori
 				array_push($result, $data);
 			}
 		}
+		$unique = array_unique($result,SORT_REGULAR);
 
-		return $result;
+		return $unique;
 	}
 
 	//PRIVATE METHODS

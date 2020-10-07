@@ -25,7 +25,7 @@ Currently only support Apriori
 
 #### Initialize
 
-```
+```php
 $apriori = new Apriori();
 $apriori->setSupport(3);
 $apriori->setConfidence(0.7);
@@ -33,7 +33,7 @@ $apriori->setConfidence(0.7);
 
 #### Train Model
 
-```
+```php
 $items = ['A', 'B', 'C', 'D', 'E'];
 $transactions = [
     ['A', 'B', 'C'],
@@ -47,14 +47,14 @@ $apriori->train($items, $transactions);
 
 #### Get Rules & Frequent Set
 
-```
+```php
 $apriori->getRules();
 $apriori->getFrequentset();
 ```
 
 ### Prediction
 
-```
+```php
 $apriori->predict(['A']);
 ```
 
@@ -63,7 +63,7 @@ $apriori->predict(['A']);
 Reach out to me at one of the following places!
 
 - Website at <a href="https://rfahmi.com" target="_blank">`rfahmi.com`</a>
-- Instagram at <a href="https://rfahmi.com" target="_blank">`rfahmi.com`</a>
+- Instagram at <a href="https://instagram.com/nm.rfahmi" target="_blank">`Fahmi Rizalul`</a>
 
 ## Buy me coffee and snacks
 
