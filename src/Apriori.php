@@ -101,6 +101,12 @@ class Apriori
 		return json_decode($string, true);
 	}
 
+	public function __construct()
+	{
+		//SET MEMORY LIMIT
+		ini_set('memory_limit', '-1');
+	}
+
 	//PUBLIC METHOD
 	public function train($items, $transactions)
 	{
@@ -123,7 +129,7 @@ class Apriori
 		$rules = json_decode(file_get_contents(__DIR__ . '/../models/apriori_rules.json'));
 		$result = [];
 		for ($i = 0; $i < count($rules); $i++) {
-			if ($this->in_array_all($items, $rules[$i]->antecedent)) {
+			if ($this->inArrayAll($items, $rules[$i]->antecedent)) {
 				$data['item'] = $rules[$i]->consequent[0];
 				$data['confidence'] = $rules[$i]->confidence;
 				array_push($result, $data);
@@ -243,7 +249,7 @@ class Apriori
 	{
 		$result = 0;
 		foreach ($this->transactions as $key => $value) {
-			if ($this->in_array_all($comb_items, $value)) {
+			if ($this->inArrayAll($comb_items, $value)) {
 				$result++;
 			}
 		}
@@ -265,7 +271,7 @@ class Apriori
 		return $result;
 	}
 
-	private function in_array_all($needles, $haystack)
+	private function inArrayAll($needles, $haystack)
 	{
 		return empty(array_diff($needles, $haystack));
 	}
