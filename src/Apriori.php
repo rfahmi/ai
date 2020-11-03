@@ -103,8 +103,9 @@ class Apriori
 
 	public function __construct()
 	{
-		//SET MEMORY LIMIT
+		//SET LIMIT
 		ini_set('memory_limit', '-1');
+		ini_set('max_execution_time', '0');
 	}
 
 	//PUBLIC METHOD
@@ -113,10 +114,15 @@ class Apriori
 		//INIT
 		$this->setItems($items);
 		$this->setTransactions($transactions);
+		$log['start_time'] = date('Y-m-d H:i:s');
 
 		try {
 			$this->frequent_set = $this->createFrequentSet();
+			$log['end_frequent'] = date('Y-m-d H:i:s');
 			$this->createRules();
+			$log['end_rules'] = date('Y-m-d H:i:s');
+
+			file_put_contents(__DIR__ . '\..\log.json', json_encode($log));
 
 			return true;
 		} catch (Exception $e) {
@@ -126,12 +132,12 @@ class Apriori
 
 	public function predict($items)
 	{
-		$rules = json_decode(file_get_contents(__DIR__ . '/../models/apriori_rules.json'));
+		$rules = json_decode(file_get_contents(__DIR__ . '/../models/apriori_rules.json'), true);
 		$result = [];
-		for ($i = 0; $i < count($rules); $i++) {
-			if ($this->inArrayAll($items, $rules[$i]->antecedent)) {
-				$data['item'] = $rules[$i]->consequent[0];
-				$data['confidence'] = $rules[$i]->confidence;
+		foreach ($rules as $key => $value) {
+			if ($this->inArrayAll($items, $value['antecedent'])) {
+				$data['item'] = $value['consequent'][0];
+				$data['confidence'] = $value['confidence'];
 				array_push($result, $data);
 			}
 		}
