@@ -5,9 +5,13 @@
   "license": "MIT",
   "authors": [
     {
-      "name": "rfahmi",
+      "name": "Fahmi Rizalul",
       "email": "rfahmi@outlook.com"
     }
   ],
-  "require": {}
+  "autoload": {
+    "psr-4": {
+        "Rfahmi\\Ai\\": "src/"
+    }
+  } 
 }

@@ -154,6 +154,7 @@ class Apriori
 				}
 			}
 			$unique = array_unique($result, SORT_REGULAR);
+			$sort = array_multisort($unique, SORT_DESC);
 
 			return $unique;
 		} else {
