@@ -1,0 +1,1 @@
+[[{"combination":["A"],"count":4},{"combination":["B"],"count":4},{"combination":["C"],"count":6},{"combination":["D"],"count":2}],{"0":{"combination":["A","B"],"count":2},"1":{"combination":["A","C"],"count":3},"3":{"combination":["B","C"],"count":3},"5":{"combination":["C","D"],"count":2}}]
