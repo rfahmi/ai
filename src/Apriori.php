@@ -145,7 +145,7 @@ class Apriori
 		$result = [];
 
 		if (file_exists($path)) {
-			$rules = json_decode(file_get_contents(__DIR__ . '/../models/apriori_rules.json'), true);
+			$rules = json_decode(file_get_contents($path), true);
 			foreach ($rules as $key => $value) {
 				if ($this->inArrayAll($items, $value['antecedent'])) {
 					$data['item'] = $value['consequent'][0];
