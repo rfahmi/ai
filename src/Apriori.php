@@ -89,14 +89,22 @@ class Apriori
 	//GETTER
 	public function getFrequentSet()
 	{
-		$string = file_get_contents(__DIR__ . '/../models/apriori_frequentset.json');
+		$path = __DIR__ . '/../models/apriori_frequentset.json';
+		$string = [];
+		if (file_exists($path)) {
+			$string = file_get_contents($path);
+		}
 
 		return json_decode($string, true);
 	}
 
 	public function getRules()
 	{
-		$string = file_get_contents(__DIR__ . '/../models/apriori_rules.json');
+		$path = __DIR__ . '/../models/apriori_rules.json';
+		$string = [];
+		if (file_exists($path)) {
+			$string = file_get_contents($path);
+		}
 
 		return json_decode($string, true);
 	}
@@ -132,18 +140,25 @@ class Apriori
 
 	public function predict($items)
 	{
-		$rules = json_decode(file_get_contents(__DIR__ . '/../models/apriori_rules.json'), true);
+		$path = __DIR__ . '/../models/apriori_rules.json';
+		$rules = [];
 		$result = [];
-		foreach ($rules as $key => $value) {
-			if ($this->inArrayAll($items, $value['antecedent'])) {
-				$data['item'] = $value['consequent'][0];
-				$data['confidence'] = $value['confidence'];
-				array_push($result, $data);
-			}
-		}
-		$unique = array_unique($result, SORT_REGULAR);
 
-		return $unique;
+		if (file_exists($path)) {
+			$rules = json_decode(file_get_contents(__DIR__ . '/../models/apriori_rules.json'), true);
+			foreach ($rules as $key => $value) {
+				if ($this->inArrayAll($items, $value['antecedent'])) {
+					$data['item'] = $value['consequent'][0];
+					$data['confidence'] = $value['confidence'];
+					array_push($result, $data);
+				}
+			}
+			$unique = array_unique($result, SORT_REGULAR);
+
+			return $unique;
+		} else {
+			return $result;
+		}
 	}
 
 	//PRIVATE METHODS
